@@ -50,6 +50,6 @@ export default defineComponent({
   background: #fff;
 }
 [data-theme="dark"] .site-layout .site-layout-background {
-  background: #1a915f;
+  background: #c0111a;
 }
 </style>

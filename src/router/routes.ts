@@ -7,7 +7,6 @@ interface RouteItem {
   title: string;
   children?: RouteItem[];
 }
-
 const routes: RouteItem[] = [
   {
     id: "1",
@@ -122,4 +121,5 @@ const routes: RouteItem[] = [
     ]
   }
 ];
+
 export default routes;
