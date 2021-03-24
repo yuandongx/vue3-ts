@@ -3,16 +3,14 @@ import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
-import http from "./libs/http";
-import { AxiosInstance } from "axios";
+import Http from "./libs/http";
 declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
-    $axios: AxiosInstance;
+    $http: Http;
   }
 }
 const app = createApp(App);
 app.use(store);
 app.use(router);
 app.mount("#app");
-
-app.config.globalProperties.$http = http;
+app.config.globalProperties.$http = new Http();

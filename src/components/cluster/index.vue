@@ -39,6 +39,10 @@ export default defineComponent({
   methods: {
     showImportModal() {
       this.showImport = true;
+      console.log(this.showImport);
+    },
+    deleteHost() {
+      console.log();
     }
   }
 });
