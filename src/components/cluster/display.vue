@@ -1,6 +1,14 @@
 <template>
-  <a-table :rowSelection="rowSelections" :data-source="data" :columns="columns" :rowKey="recoder => recoder.id" :loading="loading">
-    <template #filterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }">
+  <a-table
+    :rowSelection="rowSelections"
+    :data-source="data"
+    :columns="columns"
+    :rowKey="recoder => recoder.id"
+    :loading="loading"
+  >
+    <template
+      #filterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
+    >
       <div style="padding: 8px">
         <a-input
           :ref="c => (searchInput = c)"
@@ -19,7 +27,11 @@
           <template #icon><SearchOutlined /></template>
           查找
         </a-button>
-        <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
+        <a-button
+          size="small"
+          style="width: 90px"
+          @click="handleReset(clearFilters)"
+        >
           重置
         </a-button>
       </div>
@@ -27,14 +39,18 @@
     <template #filterIcon="filtered">
       <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
     </template>
-      <template #customRender="{ text, column }">
+    <template #customRender="{ text, column }">
       <span v-if="searchText && searchedColumn === column.dataIndex">
         <template
           v-for="(fragment, i) in text
             .toString()
             .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
         >
-          <mark v-if="fragment.toLowerCase() === searchText.toLowerCase()" class="highlight" :key="i">
+          <mark
+            v-if="fragment.toLowerCase() === searchText.toLowerCase()"
+            class="highlight"
+            :key="i"
+          >
             {{ fragment }}
           </mark>
           <template v-else>{{ fragment }}</template>
@@ -50,17 +66,16 @@
       </span>
     </template>
     <template #moreOperations="{ record }">
-
       <Tooltip title="修改">
-      <EditTwoTone @click="modify(record)"/>
+        <EditTwoTone @click="modify(record)" />
       </Tooltip>
-      <divide type="vertical"/>
+      <divide type="vertical" />
       <Tooltip title="删除">
-      <DeleteTwoTone @click="deleteHosts(record)"/>
+        <DeleteTwoTone @click="deleteHosts(record)" />
       </Tooltip>
-      <divide type="vertical"/>
+      <divide type="vertical" />
       <Tooltip title="终端交互" @click="openConsole(record)">
-      <InteractionTwoTone/>
+        <InteractionTwoTone />
       </Tooltip>
     </template>
   </a-table>
@@ -68,8 +83,23 @@
 
 <script>
 import { createVNode } from "vue";
-import { SearchOutlined, DeleteTwoTone, EditTwoTone, InteractionTwoTone, ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import {Divider, Modal, Tooltip, Table, Button, Input, Tag, message} from "ant-design-vue";
+import {
+  SearchOutlined,
+  DeleteTwoTone,
+  EditTwoTone,
+  InteractionTwoTone,
+  ExclamationCircleOutlined
+} from "@ant-design/icons-vue";
+import {
+  Divider,
+  Modal,
+  Tooltip,
+  Table,
+  Button,
+  Input,
+  Tag,
+  message
+} from "ant-design-vue";
 const data = [];
 const colors = ["green", "default", "red", "warning"];
 const tagmsgs = ["验证成功", "未验证", "主机不可达", "认证失败"];
@@ -85,48 +115,51 @@ export default {
     EditTwoTone,
     InteractionTwoTone,
     divide: Divider,
-    Tooltip,
+    Tooltip
   },
   data() {
     return {
       data,
       loading: false,
-      searchText: '',
+      searchText: "",
       searchInput: null,
-      searchedColumn: '',
+      searchedColumn: "",
       selectIds: [],
-      rowSelections:{
+      rowSelections: {
         onChange: (selectedRowKeys, selectedRows) => {
           console.log(1, selectedRowKeys);
           console.log(11, selectedRows);
-          this.selectIds = selectedRowKeys.length === selectedRows.length ? selectedRows.map(item=> item.id):[]
+          this.selectIds =
+            selectedRowKeys.length === selectedRows.length
+              ? selectedRows.map(item => item.id)
+              : [];
         },
         onSelect: (record, selected) => {
           if (selected && !this.selectIds.includes(record.id)) {
-              this.selectIds.push(record.id);
-          } else if(!selected){
+            this.selectIds.push(record.id);
+          } else if (!selected) {
             this.selectIds = this.selectIds.filter(item => item != record.id);
           }
         },
         onSelectAll: (selected, selectedRows) => {
-          let selections = [];
+          const selections = [];
           if (selected) {
-            selectedRows.forEach((item)=>{
+            selectedRows.forEach(item => {
               selections.push(item.id);
             });
             this.selectIds = selections;
           }
-        },
+        }
       },
-      columns:  [
+      columns: [
         {
-          title: '主机名',
-          dataIndex: 'hostname',
-          key: 'hostname',
+          title: "主机名",
+          dataIndex: "hostname",
+          key: "hostname",
           slots: {
-            filterDropdown: 'filterDropdown',
-            filterIcon: 'filterIcon',
-            customRender: 'customRender',
+            filterDropdown: "filterDropdown",
+            filterIcon: "filterIcon",
+            customRender: "customRender"
           },
           onFilter: (value, record) =>
             record.hostname
@@ -139,12 +172,12 @@ export default {
                 this.searchInput.focus();
               }, 0);
             }
-          },
+          }
         },
         {
-          title: '主机组',
-          dataIndex: 'hostgroup',
-          key: 'hostgroup',
+          title: "主机组",
+          dataIndex: "hostgroup",
+          key: "hostgroup",
           filters: [],
           onFilter: (value, record) =>
             record.hostgroup
@@ -157,16 +190,16 @@ export default {
                 this.searchInput.focus();
               });
             }
-          },
+          }
         },
         {
-          title: '主机地址',
-          dataIndex: 'hostip',
-          key: 'hostip',
+          title: "主机地址",
+          dataIndex: "hostip",
+          key: "hostip",
           slots: {
-            filterDropdown: 'filterDropdown',
-            filterIcon: 'filterIcon',
-            customRender: 'customRender',
+            filterDropdown: "filterDropdown",
+            filterIcon: "filterIcon",
+            customRender: "customRender"
           },
           onFilter: (value, record) =>
             record.hostip
@@ -179,41 +212,40 @@ export default {
                 this.searchInput.focus();
               });
             }
-          },
+          }
         },
         {
-          title: '主机端口',
-          dataIndex: 'port',
-          key: 'port',
-
+          title: "主机端口",
+          dataIndex: "port",
+          key: "port"
         },
         {
-          title: '访问凭证',
-          dataIndex: 'credential',
-          key: 'credential',
+          title: "访问凭证",
+          dataIndex: "credential",
+          key: "credential"
         },
         {
-          title: '描述信息',
-          dataIndex: 'description',
-          key: 'description',
+          title: "描述信息",
+          dataIndex: "description",
+          key: "description"
         },
         {
-          title: '主机状态',
-          dataIndex: 'statuscode',
-          key: 'statuscode',
-          slots:{customRender: "statusTags"},
+          title: "主机状态",
+          dataIndex: "statuscode",
+          key: "statuscode",
+          slots: { customRender: "statusTags" }
         },
         {
-          title: '操作',
-          dataIndex: 'operation',
-          key: 'operation',
-          slots: {customRender: 'moreOperations'},
-        },
-      ],
+          title: "操作",
+          dataIndex: "operation",
+          key: "operation",
+          slots: { customRender: "moreOperations" }
+        }
+      ]
     };
   },
-  mounted(){
-      this.fetch();
+  mounted() {
+    this.fetch();
   },
   methods: {
     handleSearch(selectedKeys, confirm, dataIndex) {
@@ -222,53 +254,60 @@ export default {
       this.searchedColumn = dataIndex;
       this.$forceUpdate();
     },
-    tagColor: (text)=>{
-      if (text < colors.length){
+    tagColor: text => {
+      if (text < colors.length) {
         return colors[text];
       }
       return "default";
     },
-    tagMsg: (text) => {
-      if (text < tagmsgs.length){
+    tagMsg: text => {
+      if (text < tagmsgs.length) {
         return tagmsgs[text];
       }
       return tagmsgs[1];
     },
     handleReset(clearFilters) {
       clearFilters();
-      this.searchText = '';
+      this.searchText = "";
     },
-    delOnOK: function(ids){
-      const data = ids.map(id => ({id}));
+    delOnOK: function(ids) {
+      const data = ids.map(id => ({ id }));
       // 此处需要转JSON，不然不会携带 Content-Type
-      this.http.delete("/api/host", { headers: { "Content-Type": "application/json" }, data: JSON.stringify(data) }).then(({ data }) => {
-        message.success(data);
-      }).catch(()=>{
-        message.error("删除失败。");
-      }).finally(()=>{
-        this.fetch();
-      });
+      this.$http
+        .delete("/api/cluster", {
+          headers: { "Content-Type": "application/json" },
+          data: JSON.stringify(data)
+        })
+        .then(({ data }) => {
+          message.success(data);
+        })
+        .catch(() => {
+          message.error("删除失败。");
+        })
+        .finally(() => {
+          this.fetch();
+        });
       Modal.destroyAll();
     },
-    delOnCancel: function(){
+    delOnCancel: function() {
       Modal.destroyAll();
     },
-    modify: function(param){
+    modify: function(param) {
       this.$emit("update", param);
     },
-    openConsole: function(record){
+    openConsole: function(record) {
       // let { href } = this.$router.resolve({path: "ssh", query: {id: record.id}});
       window.open(`/ssh/${record.id}`, "_blank");
     },
-    deleteHosts: function(host={}){
-      if (host.length == {} && this.selectIds.length == 0){
+    deleteHosts: function(host = {}) {
+      if (host.length == {} && this.selectIds.length == 0) {
         message.warning("未选中任何主机");
         return;
       }
 
       let msg = "是否确认删除选该主机信息？";
       let willDeletes = [];
-      if (host.id !== undefined){
+      if (host.id !== undefined) {
         willDeletes = [host.id];
       } else {
         msg = "是否确认删除选中的 " + this.selectIds.length + " 个主机信息？";
@@ -281,25 +320,31 @@ export default {
         cancelText: "取消",
         icon: createVNode(ExclamationCircleOutlined),
         onOk: () => this.delOnOK(willDeletes),
-        onCancel: this.delOnCancel,
+        onCancel: this.delOnCancel
       });
     },
-    fetch(params={}){
+    fetch(params = {}) {
       this.loading = true;
-      this.http.get("/api/host", params).then(({data})=>{
-        this.data = data;
-      let names = [];
-      data.forEach((item)=>{
-          if(!names.includes(item.hostgroup)){
-            names.push(item.hostgroup);
-          }
+      this.$http
+        .get("/api/cluster", params)
+        .then(({ data }) => {
+          this.data = data;
+          const names = [];
+          data.forEach(item => {
+            if (!names.includes(item.hostgroup)) {
+              names.push(item.hostgroup);
+            }
+          });
+          this.columns[1].filters = names.map(item => ({
+            text: item,
+            value: item
+          }));
+        })
+        .finally(() => {
+          this.loading = false;
         });
-        this.columns[1].filters = names.map((item)=>({text:item, value:item}));
-      }).finally(()=>{
-        this.loading = false;
-      });
-    },
-  },
+    }
+  }
 };
 </script>
 <style scoped>
@@ -307,7 +352,7 @@ export default {
   background-color: rgb(255, 192, 105);
   padding: 0px;
 }
-.menustyle{
+.menustyle {
   border: 0em;
   height: 10em;
 }

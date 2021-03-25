@@ -14,7 +14,7 @@
       </a-col>
     </a-row>
     <a-divider></a-divider>
-    <!-- <display ref="refresh" @update="update"/> -->
+    <the-display ref="refresh" @update="update" />
     <import-modal :showImport="showImport" />
   </div>
 </template>
@@ -23,13 +23,15 @@
 import { Button, Col, Divider, Row } from "ant-design-vue";
 import { defineComponent } from "@vue/runtime-core";
 import ImportModal from "./import.vue";
+import Display from "./display.vue";
 export default defineComponent({
   components: {
     [Button.name]: Button,
     [Col.name]: Col,
     [Row.name]: Row,
     [Divider.name]: Divider,
-    "import-modal": ImportModal
+    "import-modal": ImportModal,
+    "the-display": Display
   },
   data() {
     return {

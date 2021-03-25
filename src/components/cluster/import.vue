@@ -128,7 +128,7 @@ export default defineComponent({
       data.append("commit", "yes");
       // 需要等待上传结果， 成功之后更新表;
       try {
-        const result = await this.$http.Post("/api/cluster/upload", data);
+        const result = await this.$http.post("/api/cluster/upload", data);
         message.success(result.data);
         this.$emit("redisplay");
       } catch (error) {
@@ -140,12 +140,13 @@ export default defineComponent({
       this.fileList = [];
       this.msg = "请先下载 Excel 模板文件，并填;写表格字段对应，然后上传！";
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     upload(data: any) {
       const form = new FormData();
       form.append("file", data.file);
       form.append("commit", "no");
       this.$http
-        .Post("/api/cluster/upload", form)
+        .post("/api/cluster/upload", form)
         .then(result => {
           // console.log(result);
           const { ok, err, skip, alias } = result.data;

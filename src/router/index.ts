@@ -4,7 +4,7 @@ import "nprogress/nprogress.css";
 import Login from "../views/Login.vue";
 import Main from "../views/Main.vue";
 import routeitem1s from "./routes";
-import "../components/ssh/index.vue";
+import SSH from "../components/ssh/index.vue";
 const subRotes = routeitem1s.map(item1 => {
   if (item1.children !== undefined && item1.children !== []) {
     const route: RouteRecordRaw = {
@@ -76,6 +76,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "main",
     components: { "app-main": Main },
     children: subRotes
+  },
+  {
+    path: "/ssh/:id",
+    name: "ssh",
+    components: { "app-ssh": SSH },
+    props: true
   }
 ];
 

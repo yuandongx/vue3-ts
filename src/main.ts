@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+// import { AxiosInstance} from "axios";
 import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
@@ -9,8 +10,9 @@ declare module "@vue/runtime-core" {
     $http: Http;
   }
 }
+const http: Http = new Http();
 const app = createApp(App);
 app.use(store);
 app.use(router);
 app.mount("#app");
-app.config.globalProperties.$http = new Http();
+app.config.globalProperties.$http = http;
