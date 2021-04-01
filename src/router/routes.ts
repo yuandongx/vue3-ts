@@ -1,4 +1,4 @@
-interface RouteItem {
+export interface RouteItem {
   id: string;
   name: string;
   componentPath?: string;
@@ -22,7 +22,37 @@ const routes: RouteItem[] = [
     componentPath: "cluster",
     routePath: "/cluster",
     icon: "desktop-outlined",
-    title: "主机集群"
+    title: "主机集群",
+    children: [
+      {
+        id: "2-1",
+        name: "switch",
+        componentPath: "cluster/switch",
+        title: "交换机",
+        routePath: "/cluster/switch"
+      },
+      {
+        id: "2-2",
+        name: "firewall",
+        componentPath: "cluster/firewall",
+        title: "防火墙",
+        routePath: "/cluster/firewall"
+      },
+      {
+        id: "2-3",
+        name: "router",
+        componentPath: "cluster/router",
+        title: "路由器",
+        routePath: "/cluster/router"
+      },
+      {
+        id: "2-4",
+        name: "linux-server",
+        componentPath: "cluster/linux",
+        title: "linux-server",
+        routePath: "/cluster/route"
+      }
+    ]
   },
   {
     id: "3",

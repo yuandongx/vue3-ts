@@ -3,67 +3,83 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import Login from "../views/Login.vue";
 import Main from "../views/Main.vue";
-import routeitem1s from "./routes";
+import routeitems, { RouteItem } from "./routes";
 import SSH from "../components/ssh/index.vue";
-const subRotes = routeitem1s.map(item1 => {
-  if (item1.children !== undefined && item1.children !== []) {
+// const subRotes = routeitem1s.map(item1 => {
+//   if (item1.children !== undefined && item1.children !== []) {
+//     const route: RouteRecordRaw = {
+//       path: item1.routePath,
+//       component: () => import("../components/cluster/index.vue"),
+//       name: item1.name,
+//       children: item1.children.map(item2 => {
+//         if (item2.children !== undefined && item2.children !== []) {
+//           const route: RouteRecordRaw = {
+//             path: item2.routePath,
+//             component: () => import("../components/cluster/index.vue"),
+//             name: item2.name,
+//             children: item2.children.map(item3 => {
+//               if (item3.children !== undefined && item3.children !== []) {
+//                 const route: RouteRecordRaw = {
+//                   path: item3.routePath,
+//                   component: () => import("../components/cluster/index.vue"),
+//                   name: item3.name,
+//                   children: item3.children.map(item => {
+//                     const route: RouteRecordRaw = {
+//                       path: item.routePath,
+//                       name: item.name,
+//                       component: () => import("../components/cluster/index.vue")
+//                     };
+//                     return route;
+//                   })
+//                 };
+//                 return route;
+//               } else {
+//                 const route: RouteRecordRaw = {
+//                   path: item3.routePath,
+//                   name: item3.name,
+//                   component: () => import("../components/cluster/index.vue")
+//                 };
+//                 return route;
+//               }
+//             })
+//           };
+//           return route;
+//         } else {
+//           const route: RouteRecordRaw = {
+//             path: item2.routePath,
+//             name: item2.name,
+//             component: () => import("../components/cluster/index.vue")
+//           };
+//           return route;
+//         }
+//       })
+//     };
+//     return route;
+//   } else {
+//     const route: RouteRecordRaw = {
+//       path: item1.routePath,
+//       name: item1.name,
+//       component: () => import("../components/cluster/index.vue")
+//     };
+//     return route;
+//   }
+// });
+
+function MapRoute(dataItems: Array<RouteItem>): Array<RouteRecordRaw> {
+  const routers: Array<RouteRecordRaw> = [];
+  for (const item of dataItems) {
     const route: RouteRecordRaw = {
-      path: item1.routePath,
-      component: () => import("../components/cluster/index.vue"),
-      name: item1.name,
-      children: item1.children.map(item2 => {
-        if (item2.children !== undefined && item2.children !== []) {
-          const route: RouteRecordRaw = {
-            path: item2.routePath,
-            component: () => import("../components/cluster/index.vue"),
-            name: item2.name,
-            children: item2.children.map(item3 => {
-              if (item3.children !== undefined && item3.children !== []) {
-                const route: RouteRecordRaw = {
-                  path: item3.routePath,
-                  component: () => import("../components/cluster/index.vue"),
-                  name: item3.name,
-                  children: item3.children.map(item => {
-                    const route: RouteRecordRaw = {
-                      path: item.routePath,
-                      name: item.name,
-                      component: () => import("../components/cluster/index.vue")
-                    };
-                    return route;
-                  })
-                };
-                return route;
-              } else {
-                const route: RouteRecordRaw = {
-                  path: item3.routePath,
-                  name: item3.name,
-                  component: () => import("../components/cluster/index.vue")
-                };
-                return route;
-              }
-            })
-          };
-          return route;
-        } else {
-          const route: RouteRecordRaw = {
-            path: item2.routePath,
-            name: item2.name,
-            component: () => import("../components/cluster/index.vue")
-          };
-          return route;
-        }
-      })
+      path: item.routePath,
+      name: item.name,
+      component: () => import(`../components/${item.componentPath}/index.vue`)
     };
-    return route;
-  } else {
-    const route: RouteRecordRaw = {
-      path: item1.routePath,
-      name: item1.name,
-      component: () => import("../components/cluster/index.vue")
-    };
-    return route;
+    if (item.children !== undefined && item.children !== []) {
+      route.children = MapRoute(item.children);
+    }
+    routers.push(route);
   }
-});
+  return routers;
+}
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -75,7 +91,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "main",
     components: { "app-main": Main },
-    children: subRotes
+    children: MapRoute(routeitems)
   },
   {
     path: "/ssh/:id",
