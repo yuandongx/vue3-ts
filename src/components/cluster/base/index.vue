@@ -16,6 +16,7 @@
     <a-divider></a-divider>
     <the-display ref="display" @update="update" :platform="platform" />
     <import-modal @refresh="refresh" :platform="platform" />
+    <the-add :platform="platform" />
   </div>
 </template>
 
@@ -25,6 +26,7 @@ import { Button, Col, Divider, Row } from "ant-design-vue";
 import { defineComponent } from "@vue/runtime-core";
 import ImportModal from "./import.vue";
 import Display from "./display.vue";
+import Add from "./add.vue";
 import { useStore } from "@/store";
 import { MutationType } from "@/store/mutations";
 export default defineComponent({
@@ -40,14 +42,18 @@ export default defineComponent({
     [Row.name]: Row,
     [Divider.name]: Divider,
     "import-modal": ImportModal,
-    "the-display": Display
+    "the-display": Display,
+    "the-add": Add
   },
   setup() {
     const store = useStore();
     const setImportVisible = (v: boolean) => {
       store.commit(MutationType.SetClusterImportVisible, v);
     };
-    return { setImportVisible };
+    const setAddVisible = (v: boolean) => {
+      store.commit(MutationType.SetClusterAddVisible, v);
+    };
+    return { setImportVisible, setAddVisible };
   },
   data() {
     return {
@@ -63,6 +69,9 @@ export default defineComponent({
     },
     update() {
       console.log();
+    },
+    add() {
+      this.setAddVisible(true);
     },
     refresh() {
       this.showImport = false;

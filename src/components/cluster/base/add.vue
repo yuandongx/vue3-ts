@@ -82,8 +82,9 @@
     </a-form>
   </a-modal>
 </template>
-<script>
-import { inject } from "vue";
+<script lang="ts">
+import { useStore } from "@/store";
+import { MutationType } from "@/store/mutations";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import {
   message,
@@ -94,8 +95,18 @@ import {
   InputNumber,
   Divider
 } from "ant-design-vue";
-
-const validatIp = (_, value) => {
+import { computed, defineComponent, App } from "vue";
+interface FormData {
+  hostname: string;
+  hostgroup: string;
+  hostip: string;
+  port: number;
+  credential: string;
+  description: string;
+  id?: string | undefined;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const validatIp = (_: any, value: string) => {
   const tmp = value
     .split(".")
     .filter(
@@ -107,7 +118,7 @@ const validatIp = (_, value) => {
   }
   return Promise.resolve();
 };
-export default {
+export default defineComponent({
   components: {
     [Divider.name]: Divider,
     [Modal.name]: Modal,
@@ -144,7 +155,7 @@ export default {
         port: 22,
         credential: "",
         description: ""
-      },
+      } as FormData,
       rules: {
         hostname: [
           { required: true, message: "请输入主机名", trigger: "blur" },
@@ -187,8 +198,14 @@ export default {
     };
   },
   setup() {
-    const addHostVisiable = inject("addHostVisiable", false);
-    return { addHostVisiable };
+    const store = useStore();
+    const addHostVisiable = computed(
+      (): boolean => store.getters.clusterImportVisible
+    );
+    const setVisible = (v: boolean) => {
+      store.commit(MutationType.SetClusterAddVisible, v);
+    };
+    return { addHostVisiable, setVisible };
   },
   mounted() {
     this.fetchCred();
@@ -196,21 +213,23 @@ export default {
   },
   methods: {
     handleAddOk: async function() {
-      this.$refs.ruleForm.validate().then(() => {
-        this.add();
-      });
+      (this.$refs.ruleForm as App & { validate: Function })
+        .validate()
+        .then(() => {
+          this.add();
+        });
     },
     add: async function() {
       // 需要等待上传结果， 成功之后更新表
       try {
         let response = null;
         if (this.form.id !== undefined) {
-          response = await this.http.post(
+          response = await this.$http.post(
             `/api/cluster/${this.platform}/update`,
             this.form
           );
         } else {
-          response = await this.http.post(
+          response = await this.$http.post(
             `/api/cluster/${this.platform}/add`,
             this.form
           );
@@ -218,7 +237,7 @@ export default {
         message.success(response.data);
         this.$emit("redisplay");
         this.addHostVisiable = false;
-        this.$refs.ruleForm.resetFields();
+        (this.$refs.ruleForm as App & { resetFields: Function }).resetFields();
       } catch (error) {
         message.error(error);
       }
@@ -236,22 +255,23 @@ export default {
     // addFinsh: function() {},
     // addFinishFailed: function() {},
     fetchCred: function() {
-      this.http.get("/api/setting/credentials").then(({ data }) => {
-        this.credentials = data.map(item => item.name);
+      this.$http.get("/api/setting/credentials").then(({ data }) => {
+        // this.credentials = data.map(item=> item.name);
+        console.log(data);
       });
     },
     fetchGroups: function() {
-      this.http.get("/api/host-groups").then(({ data }) => {
+      this.$http.get("/api/host-groups").then(({ data }) => {
         this.groups = data;
       });
     },
     addItem() {
       this.newGroupModal = true;
     },
-    update: function(row) {
+    update: function(row: FormData) {
       this.addHostVisiable = true;
       this.form = row;
     }
   }
-};
+});
 </script>
