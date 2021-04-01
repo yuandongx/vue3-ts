@@ -14,12 +14,13 @@
       </a-col>
     </a-row>
     <a-divider></a-divider>
-    <the-display ref="refresh" @update="update" :platform="platform" />
-    <import-modal @refresh="reDisplay" :platform="platform" />
+    <the-display ref="display" @update="update" :platform="platform" />
+    <import-modal @refresh="refresh" :platform="platform" />
   </div>
 </template>
 
 <script lang="ts">
+import { App } from "vue";
 import { Button, Col, Divider, Row } from "ant-design-vue";
 import { defineComponent } from "@vue/runtime-core";
 import ImportModal from "./import.vue";
@@ -63,9 +64,9 @@ export default defineComponent({
     update() {
       console.log();
     },
-    reDisplay() {
+    refresh() {
       this.showImport = false;
-      // this.$refs.refresh.fetch();
+      (this.$refs.display as App & { fetch: Function }).fetch();
     }
   }
 });

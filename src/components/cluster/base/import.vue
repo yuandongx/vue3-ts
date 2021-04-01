@@ -120,7 +120,6 @@ export default defineComponent({
     },
     onOk() {
       const commit = this.commit;
-      console.log(this.fileList.length > 0 && this.levelColor == "success");
       if (this.fileList.length > 0 && this.levelColor == "success") {
         Modal.confirm({
           autoFocusButton: "ok",
@@ -145,9 +144,12 @@ export default defineComponent({
       data.append("commit", "yes");
       // 需要等待上传结果， 成功之后更新表;
       try {
-        const result = await this.$http.post("/api/cluster/upload", data);
-        message.success(result.data);
-        this.$emit("redisplay");
+        const result = await this.$http.post(
+          `/api/cluster/${this.platform}/upload`,
+          data
+        );
+        message.success(result.data.msg, 2.5);
+        this.$emit("refresh");
       } catch (error) {
         message.error(error);
       }
@@ -159,7 +161,6 @@ export default defineComponent({
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     upload(data: any) {
-      console.log(data);
       const form = new FormData();
       form.append("file", data.file);
       form.append("commit", "no");

@@ -133,8 +133,6 @@ export default {
       selectIds: [],
       rowSelections: {
         onChange: (selectedRowKeys, selectedRows) => {
-          console.log(1, selectedRowKeys);
-          console.log(11, selectedRows);
           this.selectIds =
             selectedRowKeys.length === selectedRows.length
               ? selectedRows.map(item => item.id)
@@ -332,7 +330,7 @@ export default {
     fetch(params = {}) {
       this.loading = true;
       this.$http
-        .get(`/api/cluster/${this.platform}`, params)
+        .get(`/api/cluster/${this.platform}/`, params)
         .then(({ data }) => {
           this.data = data;
           const names = [];

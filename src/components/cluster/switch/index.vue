@@ -1,5 +1,5 @@
 <template>
-  <the-view />
+  <the-view platform="switch" />
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
