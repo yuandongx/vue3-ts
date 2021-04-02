@@ -2,7 +2,7 @@
   <div>
     <a-row>
       <a-col :span="2">
-        <a-button type="link" @click="() => (addHostVisiable = true)"
+        <a-button type="link" @click="() => setAddVisible(true)"
           >新建主机</a-button
         >
       </a-col>
@@ -28,6 +28,7 @@ import ImportModal from "./import.vue";
 import Display from "./display.vue";
 import Add from "./add.vue";
 import { useStore } from "@/store";
+import { Credentials } from "@/store/somes/culster";
 import { MutationType } from "@/store/mutations";
 export default defineComponent({
   props: {
@@ -53,7 +54,10 @@ export default defineComponent({
     const setAddVisible = (v: boolean) => {
       store.commit(MutationType.SetClusterAddVisible, v);
     };
-    return { setImportVisible, setAddVisible };
+    const setCredentials = (v: Array<Credentials>) => {
+      store.commit(MutationType.SetCredentials, v);
+    };
+    return { setImportVisible, setAddVisible, setCredentials };
   },
   data() {
     return {

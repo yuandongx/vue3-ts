@@ -200,7 +200,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const addHostVisiable = computed(
-      (): boolean => store.getters.clusterImportVisible
+      (): boolean => store.getters.clusterAddVisible
     );
     const setVisible = (v: boolean) => {
       store.commit(MutationType.SetClusterAddVisible, v);
@@ -252,8 +252,12 @@ export default defineComponent({
     handleNewGroupCancle: function() {
       this.newGroupModal = false;
     },
-    // addFinsh: function() {},
-    // addFinishFailed: function() {},
+    addFinsh: function() {
+      console.log();
+    },
+    addFinishFailed: function() {
+      console.log();
+    },
     fetchCred: function() {
       this.$http.get("/api/setting/credentials").then(({ data }) => {
         // this.credentials = data.map(item=> item.name);
