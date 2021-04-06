@@ -13,7 +13,7 @@ export const getters: GetterTree<State, State> & Getters = {
     return state.clusterImportVisible;
   },
   clusterAddVisible(state) {
-    return state.clusterImportVisible;
+    return state.clusterAddVisible;
   },
   clusterCredentials(state: State) {
     return state.clusterCredentials;

@@ -274,14 +274,13 @@ export default {
       clearFilters();
       this.searchText = "";
     },
-    delOnOK: function(ids) {
-      const data = ids.map(id => ({ id }));
+    delOnOK: function() {
+      const form = new FormData();
+      form.append("data", this.selectIds.join("@"));
+      form.append("delete", "yes");
       // 此处需要转JSON，不然不会携带 Content-Type
       this.$http
-        .delete(`/api/cluster/${this.platform}/delete`, {
-          headers: { "Content-Type": "application/json" },
-          data: JSON.stringify(data)
-        })
+        .post(`/api/cluster/${this.platform}/delete`, form)
         .then(({ data }) => {
           message.success(data);
         })
@@ -318,7 +317,7 @@ export default {
         willDeletes = this.selectIds;
       }
       Modal.confirm({
-        title: "确认删除",
+        title: "确认删除?",
         content: msg,
         okText: "确定",
         cancelText: "取消",

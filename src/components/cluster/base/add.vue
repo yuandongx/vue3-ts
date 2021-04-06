@@ -219,31 +219,32 @@ export default defineComponent({
           this.add();
         });
     },
-    add: async function() {
-      // 需要等待上传结果， 成功之后更新表
-      try {
-        let response = null;
-        if (this.form.id !== undefined) {
-          response = await this.$http.post(
-            `/api/cluster/${this.platform}/update`,
-            this.form
-          );
-        } else {
-          response = await this.$http.post(
-            `/api/cluster/${this.platform}/add`,
-            this.form
-          );
-        }
-        message.success(response.data);
-        this.$emit("redisplay");
-        this.addHostVisiable = false;
-        (this.$refs.ruleForm as App & { resetFields: Function }).resetFields();
-      } catch (error) {
-        message.error(error);
+    add() {
+      this.setVisible(false);
+      if (this.form.id !== undefined) {
+        this.$http
+          .post(`/api/cluster/${this.platform}/update`, this.form)
+          .then(respone => {
+            if (respone.data == "failed") {
+              message.error("保存失败");
+            } else {
+              message.success(respone.data);
+            }
+          });
+      } else {
+        this.$http
+          .post(`/api/cluster/${this.platform}/add`, this.form)
+          .then(respone => {
+            if (respone.data == "failed") {
+              message.error("保存失败");
+            } else {
+              message.success(respone.data);
+            }
+          });
       }
     },
     handleAddCancle: function() {
-      this.addHostVisiable = false;
+      this.setVisible(false);
     },
     handleNewGroupOk: function() {
       this.newGroupModal = false;
@@ -259,13 +260,13 @@ export default defineComponent({
       console.log();
     },
     fetchCred: function() {
-      this.$http.get("/api/setting/credentials").then(({ data }) => {
-        // this.credentials = data.map(item=> item.name);
-        console.log(data);
+      this.$http.get("/api/setting/credential").then(({ data }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.credentials = data.map((item: { name: any }) => item.name);
       });
     },
     fetchGroups: function() {
-      this.$http.get("/api/host-groups").then(({ data }) => {
+      this.$http.get(`/api/cluster/${this.platform}/group`).then(({ data }) => {
         this.groups = data;
       });
     },

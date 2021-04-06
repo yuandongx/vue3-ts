@@ -3,10 +3,12 @@ export type State = {
   clusterImportVisible: boolean;
   clusterAddVisible: boolean;
   clusterCredentials: Array<Credentials>;
+  clusterGroups: Array<string>;
 };
 
 export const state: State = {
   clusterImportVisible: false,
   clusterAddVisible: false,
-  clusterCredentials: []
+  clusterCredentials: [],
+  clusterGroups: []
 };
