@@ -96,15 +96,7 @@ import {
   Divider
 } from "ant-design-vue";
 import { computed, defineComponent, App } from "vue";
-interface FormData {
-  hostname: string;
-  hostgroup: string;
-  hostip: string;
-  port: number;
-  credential: string;
-  description: string;
-  id?: string | undefined;
-}
+import { FormData } from "./interface";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const validatIp = (_: any, value: string) => {
   const tmp = value
@@ -273,8 +265,7 @@ export default defineComponent({
     addItem() {
       this.newGroupModal = true;
     },
-    update: function(row: FormData) {
-      this.addHostVisiable = true;
+    update(row: FormData) {
       this.form = row;
     }
   }

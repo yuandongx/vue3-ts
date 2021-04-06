@@ -1,3 +1,4 @@
+/* eslint-disable to ignore the next line */
 <template>
   <div>
     <a-row>
@@ -14,9 +15,9 @@
       </a-col>
     </a-row>
     <a-divider></a-divider>
-    <the-display ref="display" @update="update" :platform="platform" />
+    <the-display ref="display" @update="onUpdate" :platform="platform" />
     <import-modal @refresh="refresh" :platform="platform" />
-    <the-add :platform="platform" />
+    <the-add :platform="platform" ref="updateAddForm" />
   </div>
 </template>
 
@@ -30,6 +31,7 @@ import Add from "./add.vue";
 import { useStore } from "@/store";
 import { Credentials } from "@/store/somes/culster";
 import { MutationType } from "@/store/mutations";
+import { FormData } from "./interface";
 export default defineComponent({
   props: {
     platform: {
@@ -71,8 +73,9 @@ export default defineComponent({
     deleteHost() {
       console.log();
     },
-    update() {
-      console.log();
+    onUpdate(param: FormData) {
+      this.setAddVisible(true);
+      (this.$refs.updateAddForm as App & { update: Function }).update(param);
     },
     add() {
       this.setAddVisible(true);

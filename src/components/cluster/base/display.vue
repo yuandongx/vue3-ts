@@ -274,9 +274,9 @@ export default {
       clearFilters();
       this.searchText = "";
     },
-    delOnOK: function() {
+    delOnOK: function(deleteIds) {
       const form = new FormData();
-      form.append("data", this.selectIds.join("@"));
+      form.append("data", deleteIds.join("@"));
       form.append("delete", "yes");
       // 此处需要转JSON，不然不会携带 Content-Type
       this.$http
@@ -307,7 +307,6 @@ export default {
         message.warning("未选中任何主机");
         return;
       }
-
       let msg = "是否确认删除选该主机信息？";
       let willDeletes = [];
       if (host.id !== undefined) {
