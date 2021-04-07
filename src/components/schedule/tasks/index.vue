@@ -32,15 +32,27 @@
   </a-row>
   <a-divider />
   <task-show />
+  <task-create />
 </template>
 <script lang="ts">
-import TaskShow from "../com/task-show.vue";
+import TaskShow from "./task-show.vue";
+import TaskCreate from "./task-create.vue";
 import { defineComponent } from "vue";
 import { Input, Row, Col, Divider, Button } from "ant-design-vue";
+import { useStore } from "@/store";
+import { MutationType } from "@/store/mutations";
 const gutter = { xs: 8, sm: 16, md: 24 };
 export default defineComponent({
+  setup() {
+    const store = useStore();
+    const setTaskCreateVisible = (v: boolean) => {
+      store.commit(MutationType.SetTaskCreateVisible, v);
+    };
+    return { setTaskCreateVisible };
+  },
   components: {
     TaskShow,
+    TaskCreate,
     "a-button": Button,
     "a-input-search": Input.Search,
     "a-row": Row,
@@ -66,7 +78,7 @@ export default defineComponent({
       console.log();
     },
     createTask() {
-      console.log();
+      this.setTaskCreateVisible(true);
     }
   }
 });
