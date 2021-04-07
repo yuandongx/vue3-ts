@@ -280,7 +280,7 @@ export default {
       form.append("delete", "yes");
       // 此处需要转JSON，不然不会携带 Content-Type
       this.$http
-        .post(`/api/cluster/${this.platform}/delete`, form)
+        .post(`/v1/cluster/${this.platform}/delete`, form)
         .then(({ data }) => {
           message.success(data);
         })
@@ -328,7 +328,7 @@ export default {
     fetch(params = {}) {
       this.loading = true;
       this.$http
-        .get(`/api/cluster/${this.platform}/`, params)
+        .get(`/v1/cluster/${this.platform}/`, params)
         .then(({ data }) => {
           this.data = data;
           const names = [];

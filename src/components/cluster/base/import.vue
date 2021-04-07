@@ -145,7 +145,7 @@ export default defineComponent({
       // 需要等待上传结果， 成功之后更新表;
       try {
         const result = await this.$http.post(
-          `/api/cluster/${this.platform}/upload`,
+          `/v1/cluster/${this.platform}/upload`,
           data
         );
         message.success(result.data.msg, 2.5);
@@ -165,7 +165,7 @@ export default defineComponent({
       form.append("file", data.file);
       form.append("commit", "no");
       this.$http
-        .post(`/api/cluster/${this.platform}/upload`, form)
+        .post(`/v1/cluster/${this.platform}/upload`, form)
         .then(result => {
           const { ok, err, skip, alias } = result.data;
           this.fileAlias = alias;

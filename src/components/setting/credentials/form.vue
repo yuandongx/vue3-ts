@@ -129,9 +129,9 @@ export default {
             let response = null;
             try {
                 if (this.form.id === undefined){
-                    response = await this.http.post("/api/setting/credentials", this.form)
+                    response = await this.http.post("/v1/setting/credentials", this.form)
                 }else if(this.form.id !== undefined){
-                    response = await this.http.patch("/api/setting/credentials", this.form)
+                    response = await this.http.patch("/v1/setting/credentials", this.form)
                 }
                 if(response.data !== undefined){
                     message.success(response.data);

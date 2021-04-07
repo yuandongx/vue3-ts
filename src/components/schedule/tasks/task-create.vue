@@ -44,7 +44,11 @@
         class="opreat-host-button"
         >选择主机</a-button
       >
-      <a-button v-if="current == 1" type="link" class="opreat-host-button"
+      <a-button
+        v-if="current == 1"
+        type="link"
+        class="opreat-host-button"
+        @click="onDelet"
         >删除主机</a-button
       >
       <a-table
@@ -54,7 +58,9 @@
         :row-selection="rowSelection"
       ></a-table>
     </a-form>
-    <select-host />
+    <select-host v-if="current == 1" />
+    <task-policy v-if="current == 2" />
+    <task-notify v-if="current == 3" />
   </a-modal>
 </template>
 <script lang="ts">
@@ -71,7 +77,9 @@ import { useStore } from "@/store";
 import { MutationType } from "@/store/mutations";
 import { defineComponent, computed, ref } from "vue";
 import { TaskInfo, TableColums, HostInfo } from "../com/interface";
-import SelectHost from "./select-host.vue";
+import SelectHost from "./task-host.vue";
+import TaskPolicy from "./task-policy.vue";
+import TaskNotify from "./task-notify.vue";
 const rowItemWrap = {
   sm: { span: 22, offset: 1 }
 };
@@ -93,7 +101,8 @@ export default defineComponent({
       steps: [
         { key: "1", title: "任务内容" },
         { key: "2", title: "目标主机" },
-        { key: "3", title: "执行策略" }
+        { key: "3", title: "执行策略" },
+        { key: "4", title: "结果通知" }
       ],
       rowItemWrap,
       loading: false,
@@ -107,6 +116,8 @@ export default defineComponent({
   },
   components: {
     SelectHost,
+    TaskPolicy,
+    TaskNotify,
     "a-modal": Modal,
     "a-steps": Steps,
     "a-step": Steps.Step,
@@ -120,6 +131,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const current = ref<number>(0);
+    let deletSelectedHosts: HostInfo[] = [];
     const thisVisible = computed((): boolean => {
       return store.getters.taskCreateVisible;
     });
@@ -129,6 +141,9 @@ export default defineComponent({
     const setSelectHostsVisible = (v: boolean) => {
       store.commit(MutationType.SetSelectHostsVisible, v);
     };
+    const setSeletedHosts = (v: HostInfo[]) => {
+      store.commit(MutationType.SetSelectedHosts, v);
+    };
     const selectedHosts = computed(() => {
       return store.getters.selectedHosts;
     });
@@ -137,34 +152,35 @@ export default defineComponent({
         selectedRowKeys: (string | number)[],
         selectedRows: HostInfo[]
       ) => {
-        console.log(
-          `selectedRowKeys: ${selectedRowKeys}`,
-          "selectedRows: ",
-          selectedRows
-        );
+        if (selectedRowKeys.length == selectedRows.length) {
+          deletSelectedHosts = selectedRows;
+        }
       },
       onSelect: (
         record: HostInfo,
         selected: boolean,
         selectedRows: HostInfo[]
       ) => {
-        console.log(record, selected, selectedRows);
+        deletSelectedHosts = selectedRows;
       },
-      onSelectAll: (
-        selected: boolean,
-        selectedRows: HostInfo[],
-        changeRows: HostInfo[]
-      ) => {
-        console.log(selected, selectedRows, changeRows);
+      onSelectAll: (selected: boolean, selectedRows: HostInfo[]) => {
+        // console.log(selected, selectedRows, changeRows);
+        if (selected) {
+          deletSelectedHosts = selectedRows;
+        }
       }
     };
+
+    const undoSelectHosts = () => deletSelectedHosts;
     return {
       current,
       thisVisible,
       setSelectHostsVisible,
       setThisVisible,
       selectedHosts,
-      rowSelection
+      rowSelection,
+      undoSelectHosts,
+      setSeletedHosts
     };
   },
   methods: {
@@ -183,6 +199,14 @@ export default defineComponent({
     },
     onSelectHosts() {
       this.setSelectHostsVisible(true);
+    },
+    onDelet() {
+      const selected = this.selectedHosts.filter(
+        item => !this.undoSelectHosts().includes(item)
+      );
+      console.log("selected", selected);
+      console.log("this.deletSelectedHosts", this.undoSelectHosts());
+      this.setSeletedHosts(selected);
     }
   }
 });

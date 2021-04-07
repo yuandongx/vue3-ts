@@ -67,7 +67,7 @@ export default {
     methods:{
         fetch(){
             this.loading = true;
-            this.http.get("/api/setting/credentials").then(({data})=>{
+            this.http.get("/v1/setting/credentials").then(({data})=>{
                 this.data = data;
                 this.saveCredent(data);
             }).finally(()=>{
@@ -78,7 +78,7 @@ export default {
             this.$emit("update", recoder);
         },
         delOnOK: function(recoder){
-            this.http.delete("/api/setting/credentials", recoder).then(({data})=>{
+            this.http.delete("/v1/setting/credentials", recoder).then(({data})=>{
                 message.success(data);
             });
         },

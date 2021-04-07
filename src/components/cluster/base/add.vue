@@ -215,7 +215,7 @@ export default defineComponent({
       this.setVisible(false);
       if (this.form.id !== undefined) {
         this.$http
-          .post(`/api/cluster/${this.platform}/update`, this.form)
+          .post(`/v1/cluster/${this.platform}/update`, this.form)
           .then(respone => {
             if (respone.data == "failed") {
               message.error("保存失败");
@@ -225,7 +225,7 @@ export default defineComponent({
           });
       } else {
         this.$http
-          .post(`/api/cluster/${this.platform}/add`, this.form)
+          .post(`/v1/cluster/${this.platform}/add`, this.form)
           .then(respone => {
             if (respone.data == "failed") {
               message.error("保存失败");
@@ -252,13 +252,13 @@ export default defineComponent({
       console.log();
     },
     fetchCred: function() {
-      this.$http.get("/api/setting/credential").then(({ data }) => {
+      this.$http.get("/v1/setting/credential").then(({ data }) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.credentials = data.map((item: { name: any }) => item.name);
       });
     },
     fetchGroups: function() {
-      this.$http.get(`/api/cluster/${this.platform}/group`).then(({ data }) => {
+      this.$http.get(`/v1/cluster/${this.platform}/group`).then(({ data }) => {
         this.groups = data;
       });
     },

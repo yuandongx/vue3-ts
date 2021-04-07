@@ -56,11 +56,11 @@ const routes: RouteItem[] = [
   },
   {
     id: "3",
-    name: "deployment",
-    componentPath: "deployment",
-    routePath: "/deployment",
+    name: "playbooks",
+    componentPath: "playbooks",
+    routePath: "/playbooks",
     icon: "deployment-unit-outlined",
-    title: "安装部署"
+    title: "剧本列表"
   },
   {
     id: "4",

@@ -25,6 +25,7 @@ export interface HostInfo {
   port: string;
   platform: string;
   description: string;
+  key: string;
 }
 
 export const TableColums = [
@@ -39,13 +40,7 @@ export const TableColums = [
     slots: { customRender: "operation" }
   }
 ];
-export const TableColumsSelectHost = [
-  { title: "主机名", dataIndex: "name" },
-  { title: "平台", dataIndex: "platform" },
-  { title: "主机地址", dataIndex: "port" },
-  { title: "访问端口", dataIndex: "ip" },
-  { title: "其它信息", dataIndex: "description" }
-];
+
 export const TaskColums = [
   { title: "名称", dataIndex: "name", key: "name" },
   { title: "平台", dataIndex: "platform", key: "platform" },

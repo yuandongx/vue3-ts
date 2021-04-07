@@ -17,7 +17,7 @@ export default {
   },
   mounted() {
     this.loading = true;
-    this.http.get("/api/host").then(({ data }) => {
+    this.http.get("/v1/host").then(({ data }) => {
       this.hosts = data;
       this.loading = false;
     });
