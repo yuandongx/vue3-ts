@@ -76,6 +76,7 @@ interface Data {
   currentEdge: Item | undefined;
   sourceNodeId: string | undefined;
   edgeId: string | undefined;
+  addingEdge: boolean;
 }
 
 export default defineComponent({
@@ -98,7 +99,8 @@ export default defineComponent({
       graphdata: undefined,
       currentEdge: undefined,
       sourceNodeId: undefined,
-      edgeId: undefined
+      edgeId: undefined,
+      addingEdge: false
     } as Data;
   },
   mounted() {
@@ -154,12 +156,19 @@ export default defineComponent({
           linkDistance: 100
         },
         modes: {
-          default: ["drag-canvas", "zoom-canvas", "drag-node", "clik-add-edge"]
+          addEdge: [
+            "drag-canvas",
+            "zoom-canvas",
+            "drag-node",
+            "clik-add-edge",
+            "click-select"
+          ]
         },
         plugins: [menu]
       });
-      // this.g6.on("click", this.onClick);
-      // this.g6.on("mousemove", this.onMouseMove);
+
+      this.g6.read({ nodes: [], edges: [] });
+      const self = this;
       registerBehavior("clik-add-edge", {
         getEvents() {
           return {
@@ -168,71 +177,60 @@ export default defineComponent({
             "edge:click": "onEdgeClick"
           };
         },
-        onMousemove: this.onMouseMove,
-        onClick: this.onClick,
-        onEdgeClick: this.onEdgeClick
-      });
-      this.g6.read({ nodes: [], edges: [] });
-    },
-    onEdgeClick(e: IG6GraphEvent) {
-      console.log(e);
-    },
-    onClick(e: IG6GraphEvent) {
-      const item = e.item;
-      // const target = e.target;
-      console.log("000000000000000");
-      if (this.g6) {
-        if (item) {
-          console.log("444444", item);
-          const model = item.getModel();
-          console.log("model.id", model.id);
-          if (this.currentEdge == undefined) {
-            this.sourceNodeId = model.id;
-            this.edgeId = getUID();
+        onMousemove(event: IG6GraphEvent) {
+          if (self.currentEdge != undefined) {
             const point = {
-              x: e.x,
-              y: e.y
+              x: event.x,
+              y: event.y
             };
-            console.log("this.edgeId", this.edgeId);
-            this.currentEdge = this.g6.addItem("edge", {
-              type: "polyline",
-              source: model.id,
+            self.g6?.updateItem(self.currentEdge, {
               target: point
             });
-
-            console.log("111111111");
-            console.log("111111111", this.currentEdge);
-          } else if (
-            this.currentEdge != undefined &&
-            this.edgeId != undefined
-          ) {
-            this.g6?.update(this.edgeId, {
-              target: model.id
-            });
-            this.currentEdge = undefined;
-            console.log("222222");
           }
-        } else {
-          console.log("33333");
-          if (this.currentEdge != undefined && this.edgeId != undefined) {
-            this.g6.remove(this.edgeId);
-            this.currentEdge = undefined;
-            this.edgeId = undefined;
+        },
+        onClick(event: IG6GraphEvent) {
+          const point = {
+            x: event.x,
+            y: event.y
+          };
+          const node = event.item;
+          if (node) {
+            const id = node.getID();
+            if (self.currentEdge == undefined && self.addingEdge == false) {
+              // self.edgeId = getUID();
+              self.currentEdge = self.g6?.addItem("edge", {
+                id: self.edgeId,
+                source: id,
+                target: point
+              });
+              self.addingEdge = true;
+            } else if (self.currentEdge != undefined && self.addingEdge) {
+              self.g6?.updateItem(self.currentEdge, {
+                target: id
+              });
+              self.currentEdge = undefined;
+              self.addingEdge = false;
+            }
+          } else {
+            console.log("click node ", node, " is not accessed.");
+          }
+        },
+        onEdgeClick(event: IG6GraphEvent) {
+          const item = event.item;
+          if (item) {
+            if (self.addingEdge && self.currentEdge?.getID() == item.getID()) {
+              self.g6?.removeItem(self.currentEdge);
+              self.currentEdge = undefined;
+              self.addingEdge = false;
+            }
           }
         }
-      }
+      });
+      self.g6?.setMode("addEdge");
     },
-    onMouseMove(e: IG6GraphEvent) {
-      const point = {
-        x: e.x,
-        y: e.y
-      };
-      // console.log(point);
-      if (this.currentEdge != undefined) {
-        this.g6?.update(this.currentEdge, {
-          target: point
-        });
-      }
+
+    onEdgeClick(e: IG6GraphEvent) {
+      console.log(e);
     },
 
     onDragEnd(event: IG6GraphEvent, icon: string, nid: string) {
@@ -241,7 +239,7 @@ export default defineComponent({
       const newNode = {
         label: nid,
         img: icon,
-        id: getUID(),
+        id: getUID("node"),
         x: point?.x,
         y: point?.y,
         type: "image",
@@ -249,7 +247,7 @@ export default defineComponent({
       };
       this.g6?.add("node", newNode);
       this.graphdata = this.g6?.save();
-      console.log(this.graphdata);
+      // console.log(this.graphdata);
       this.g6?.read(this.graphdata as GraphData);
     }
   }
