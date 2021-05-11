@@ -52,9 +52,17 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Graph, Menu as GMenu, GraphData, TreeGraphData } from "@antv/g6";
+import {
+  Graph,
+  Menu as GMenu,
+  GraphData,
+  TreeGraphData,
+  IG6GraphEvent,
+  Item,
+  registerBehavior
+} from "@antv/g6";
 import { Tabs, Tooltip, Layout } from "ant-design-vue";
-import { guid } from "./base";
+import { getUID } from "./base";
 import {
   AppstoreFilled,
   ControlFilled,
@@ -65,6 +73,9 @@ interface Data {
   g6: Graph | null;
   tabBarGutter: number;
   graphdata: G6data;
+  currentEdge: Item | undefined;
+  sourceNodeId: string | undefined;
+  edgeId: string | undefined;
 }
 
 export default defineComponent({
@@ -84,7 +95,10 @@ export default defineComponent({
     return {
       tabBarGutter: 0,
       g6: null,
-      graphdata: undefined
+      graphdata: undefined,
+      currentEdge: undefined,
+      sourceNodeId: undefined,
+      edgeId: undefined
     } as Data;
   },
   mounted() {
@@ -126,25 +140,108 @@ export default defineComponent({
             type: "circle"
           }
         },
+        defaultEdge: {
+          type: "polyline",
+          style: {
+            stroke: "#000000",
+            lineWidth: 5,
+            endArrow: true
+          }
+        },
         layout: {
           type: "force",
           preventOverlap: true,
           linkDistance: 100
         },
         modes: {
-          default: ["drag-canvas", "zoom-canvas", "drag-node", "create-edge"]
+          default: ["drag-canvas", "zoom-canvas", "drag-node", "clik-add-edge"]
         },
         plugins: [menu]
       });
+      // this.g6.on("click", this.onClick);
+      // this.g6.on("mousemove", this.onMouseMove);
+      registerBehavior("clik-add-edge", {
+        getEvents() {
+          return {
+            "node:click": "onClick",
+            mousemove: "onMousemove",
+            "edge:click": "onEdgeClick"
+          };
+        },
+        onMousemove: this.onMouseMove,
+        onClick: this.onClick,
+        onEdgeClick: this.onEdgeClick
+      });
       this.g6.read({ nodes: [], edges: [] });
     },
-    onDragEnd(event: DragEvent, icon: string, nid: string) {
-      event.dataTransfer?.setData("text/plain", icon);
-      const point = this.g6?.getPointByClient(event.screenX, event.screenY);
+    onEdgeClick(e: IG6GraphEvent) {
+      console.log(e);
+    },
+    onClick(e: IG6GraphEvent) {
+      const item = e.item;
+      // const target = e.target;
+      console.log("000000000000000");
+      if (this.g6) {
+        if (item) {
+          console.log("444444", item);
+          const model = item.getModel();
+          console.log("model.id", model.id);
+          if (this.currentEdge == undefined) {
+            this.sourceNodeId = model.id;
+            this.edgeId = getUID();
+            const point = {
+              x: e.x,
+              y: e.y
+            };
+            console.log("this.edgeId", this.edgeId);
+            this.currentEdge = this.g6.addItem("edge", {
+              type: "polyline",
+              source: model.id,
+              target: point
+            });
+
+            console.log("111111111");
+            console.log("111111111", this.currentEdge);
+          } else if (
+            this.currentEdge != undefined &&
+            this.edgeId != undefined
+          ) {
+            this.g6?.update(this.edgeId, {
+              target: model.id
+            });
+            this.currentEdge = undefined;
+            console.log("222222");
+          }
+        } else {
+          console.log("33333");
+          if (this.currentEdge != undefined && this.edgeId != undefined) {
+            this.g6.remove(this.edgeId);
+            this.currentEdge = undefined;
+            this.edgeId = undefined;
+          }
+        }
+      }
+    },
+    onMouseMove(e: IG6GraphEvent) {
+      const point = {
+        x: e.x,
+        y: e.y
+      };
+      // console.log(point);
+      if (this.currentEdge != undefined) {
+        this.g6?.update(this.currentEdge, {
+          target: point
+        });
+      }
+    },
+
+    onDragEnd(event: IG6GraphEvent, icon: string, nid: string) {
+      // event.dataTransfer?.setData("text/plain", icon);
+      const point = this.g6?.getPointByClient(event.x, event.y);
       const newNode = {
         label: nid,
         img: icon,
-        id: guid(),
+        id: getUID(),
         x: point?.x,
         y: point?.y,
         type: "image",
