@@ -1,5 +1,5 @@
 <template>
-  <div class="div-0-panel box">
+  <div class="div-main-panel box">
     <a-tabs :tabBarGutter="tabBarGutter">
       <a-tab-pane key="1">
         <template #tab>
@@ -40,14 +40,11 @@
       </a-tab-pane>
     </a-tabs>
   </div>
-  <div class="div-1-panel box">
-    <a-layout>
-      <a-layout-header>header</a-layout-header>
-      <a-layout-content>
-        <div class="div-content" id="content-g6"></div>
-      </a-layout-content>
-      <a-layout-foot>foot</a-layout-foot>
-    </a-layout>
+  <div class="div-content-panel box">
+    <div class="div-header" id="header-g6">
+      <div id="toolbarContainer" />
+    </div>
+    <div class="div-content-canvas" id="content-g6" />
   </div>
 </template>
 <script lang="ts">
@@ -59,9 +56,11 @@ import {
   TreeGraphData,
   IG6GraphEvent,
   Item,
-  registerBehavior
+  registerBehavior,
+  Minimap
 } from "@antv/g6";
-import { Tabs, Tooltip, Layout } from "ant-design-vue";
+import insertCss from "insert-css";
+import { Tabs, Tooltip } from "ant-design-vue";
 import { getUID } from "./base";
 import {
   AppstoreFilled,
@@ -86,11 +85,7 @@ export default defineComponent({
     SettingFilled,
     "a-tabs": Tabs,
     "a-tab-pane": Tabs.TabPane,
-    "a-tool-tip": Tooltip,
-    "a-layout": Layout,
-    "a-layout-header": Layout.Header,
-    "a-layout-content": Layout.Content,
-    "a-layout-foot": Layout.Footer
+    "a-tool-tip": Tooltip
   },
   data() {
     return {
@@ -107,51 +102,113 @@ export default defineComponent({
     this.onInit();
   },
   methods: {
+    loadCss() {
+      insertCss(`
+                .g6-minimap-container {
+                    border: 1px solid #606067;
+                }
+
+                .g6-minimap-viewport {
+                    border: 2px solid #000;
+                }
+
+                .g6-minimap {
+                    position: fixed;
+                    right: 10px;
+                    bottom: 10px;
+                }
+                
+                .g6-component-contextmenu {
+                    position: absolute;
+                    list-style-type: none;
+                    padding: 10px 8px;
+                    left: -150px;
+                    background-color: rgba(255, 255, 255, 0.9);
+                    border: 1px solid #e2e2e2;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    color: #3c3c3c;
+                }
+
+                .g6-component-contextmenu ul {
+                    padding-left: 0px;
+                    line-height: 30px;
+                    margin: 0px;
+                }
+
+                .g6-component-contextmenu li {
+                    cursor: pointer;
+                    list-style-type:none;
+                    list-style: none;
+                    margin-left: 0px;
+                }
+
+                .g6-component-contextmenu li:hover {
+                    color: #bd2c2d;
+                }
+
+            `);
+    },
     onInit() {
       const width = document.getElementById("content-g6")?.scrollWidth;
       const height = document.getElementById("content-g6")?.scrollHeight;
       const menu = new GMenu({
         offsetX: 6,
         offsetY: 6,
-        itemTypes: ["node"],
+        itemTypes: ["node", "edge"],
         getContent() {
           const outDiv = document.createElement("div");
-          outDiv.style.width = "180px";
+          outDiv.style.width = "70px";
           outDiv.innerHTML = `<ul>
-              <li>测试01</li>
-              <li>测试01</li>
-              <li>测试01</li>
-              <li>测试01</li>
-              <li>测试01</li>
+              <li>查看</li>
+              <li>编辑</li>
+              <li>删除</li>
             </ul>`;
           return outDiv;
         },
-        // eslint-disable-next-line
-        handleMenuClick(target: Event, item: any): void {
+        handleMenuClick(target: Event, item: Item): void {
           console.log(target, item);
         }
       });
+      const minMap = new Minimap({
+        size: [150, 100],
+        className: "minmap",
+        type: "delegate"
+      });
+
       this.g6 = new Graph({
         container: "content-g6",
         width: width,
         height: height,
+        // fitCenter: true,
         defaultNode: {
           type: "image",
           clipCfg: {
             show: true,
             type: "circle"
-          }
+          },
+          anchorPoints: [
+            [0, 0.5],
+            [0.5, 0],
+            [1, 0.5],
+            [0.5, 1]
+          ]
         },
         defaultEdge: {
           type: "polyline",
           style: {
-            stroke: "#000000",
-            lineWidth: 5,
+            stroke: "#9C9C9C",
+            lineWidth: 3,
             endArrow: true
           }
         },
+        edgeStateStyles: {
+          hover: {
+            stroke: "#4F4F4F",
+            lineWidth: 4
+          }
+        },
         layout: {
-          type: "force",
           preventOverlap: true,
           linkDistance: 100
         },
@@ -164,7 +221,8 @@ export default defineComponent({
             "click-select"
           ]
         },
-        plugins: [menu]
+        plugins: [menu, minMap],
+        enabledStack: true
       });
 
       this.g6.read({ nodes: [], edges: [] });
@@ -174,8 +232,22 @@ export default defineComponent({
           return {
             "node:click": "onClick",
             mousemove: "onMousemove",
-            "edge:click": "onEdgeClick"
+            "edge:click": "onEdgeClick",
+            "edge:mouseenter": "onEdgeMouseEnter",
+            "edge:mouseleave": "onEdgeMouseLeave"
           };
+        },
+        onEdgeMouseEnter(event: IG6GraphEvent) {
+          const item = event.item;
+          if (item) {
+            self.g6?.setItemState(item, "hover", true);
+          }
+        },
+        onEdgeMouseLeave(event: IG6GraphEvent) {
+          const item = event.item;
+          if (item) {
+            self.g6?.setItemState(item, "hover", false);
+          }
         },
         onMousemove(event: IG6GraphEvent) {
           if (self.currentEdge != undefined) {
@@ -197,7 +269,6 @@ export default defineComponent({
           if (node) {
             const id = node.getID();
             if (self.currentEdge == undefined && self.addingEdge == false) {
-              // self.edgeId = getUID();
               self.currentEdge = self.g6?.addItem("edge", {
                 id: self.edgeId,
                 source: id,
@@ -234,7 +305,6 @@ export default defineComponent({
     },
 
     onDragEnd(event: IG6GraphEvent, icon: string, nid: string) {
-      // event.dataTransfer?.setData("text/plain", icon);
       const point = this.g6?.getPointByClient(event.x, event.y);
       const newNode = {
         label: nid,
@@ -247,7 +317,6 @@ export default defineComponent({
       };
       this.g6?.add("node", newNode);
       this.graphdata = this.g6?.save();
-      // console.log(this.graphdata);
       this.g6?.read(this.graphdata as GraphData);
     }
   }
@@ -256,24 +325,19 @@ export default defineComponent({
 <style scoped>
 .box {
   float: left;
-  border-width: 2px;
+  border-width: 1px;
   height: 85vh;
 }
-.div-0-panel {
-  border-color: rgb(18, 19, 18);
+.div-main-panel {
+  border-color: rgb(70, 126, 70);
   border-style: groove;
   width: 10%;
 }
-.div-1-panel {
-  border-color: rgb(18, 19, 18);
+.div-content-panel {
+  border-color: rgb(12, 117, 12);
   border-style: groove;
   width: 90%;
   overflow: auto;
-}
-.div-2-panel {
-  border-color: rgb(18, 19, 18);
-  border-style: groove;
-  width: 10%;
 }
 .div-node {
   width: 100px;
@@ -283,7 +347,13 @@ img {
   max-width: 50%;
   height: auto;
 }
-.div-content {
+.div-content-canvas {
   height: 70vh;
+  border-width: 1px;
+  border-color: blue;
+  background-color: rgb(205, 209, 201);
+}
+.div-header {
+  background-color: blanchedalmond;
 }
 </style>

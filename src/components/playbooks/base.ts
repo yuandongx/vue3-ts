@@ -16,49 +16,13 @@ export function getUID(type: string | undefined): string {
   return st + "-" + randChars;
 }
 
-export interface Node {
-  label: string;
-  img: string;
-  id: string;
-  onlyOne?: boolean;
-  x?: number | undefined;
-  y?: number | undefined;
-  type?: string;
-  size?: number;
-}
-export interface Edge {
-  source: string;
-  target: string;
-}
-export interface Variable {
-  key: string;
-  value: string;
-}
-export interface GraphData {
-  nodes: Array<Node>;
-  edges: Array<Edge>;
-}
-export interface TaskNode extends Node {
-  variables?: Array<Variable>;
-  uid: string;
+export interface MetaData {
+  [key: string]: string; // 节点变量，key/value
 }
 
-export function CreateNode(
-  label: string,
-  img: string,
-  x: number | undefined,
-  y: number | undefined,
-  onlyOne: boolean,
-  type: string
-) {
-  return {
-    label: label,
-    img: img,
-    id: getUID("node"),
-    x: x,
-    y: y,
-    onlyOne: onlyOne,
-    type: type,
-    size: 100
-  } as Node;
+export interface DataNode {
+  label: string;
+  id: string;
+  onlyOne?: boolean;
+  metaData: MetaData[];
 }
