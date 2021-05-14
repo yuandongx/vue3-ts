@@ -11,11 +11,12 @@
           </a-tool-tip>
         </template>
         <div
-          class="div-node"
           draggable="true"
-          @dragend="onDragEnd($event, '/img/playbook/control/end.png', 'end')"
+          @dragend="onDragEnd($event, item)"
+          v-for="item in controNodes"
+          :key="item.appId"
         >
-          <img src="/img/playbook/control/end.png" />
+          <img :src="item.imgPath" />
         </div>
       </a-tab-pane>
       <a-tab-pane key="2">
@@ -53,29 +54,29 @@ import {
   Graph,
   Menu as GMenu,
   GraphData,
-  TreeGraphData,
   IG6GraphEvent,
   Item,
   registerBehavior,
   Minimap
 } from "@antv/g6";
 import insertCss from "insert-css";
-import { Tabs, Tooltip } from "ant-design-vue";
-import { getUID } from "./base";
+import { Tabs, Tooltip, message } from "ant-design-vue";
+import { NodeData, getControlNodesInfo } from "./base";
 import {
   AppstoreFilled,
   ControlFilled,
   SettingFilled
 } from "@ant-design/icons-vue";
-type G6data = GraphData | TreeGraphData | undefined;
+type G6data = GraphData;
 interface Data {
   g6: Graph | null;
   tabBarGutter: number;
-  graphdata: G6data;
+  graphdata: G6data | undefined;
   currentEdge: Item | undefined;
   sourceNodeId: string | undefined;
   edgeId: string | undefined;
   addingEdge: boolean;
+  controNodes: NodeData[];
 }
 
 export default defineComponent({
@@ -95,7 +96,8 @@ export default defineComponent({
       currentEdge: undefined,
       sourceNodeId: undefined,
       edgeId: undefined,
-      addingEdge: false
+      addingEdge: false,
+      controNodes: getControlNodesInfo()
     } as Data;
   },
   mounted() {
@@ -166,8 +168,19 @@ export default defineComponent({
             </ul>`;
           return outDiv;
         },
-        handleMenuClick(target: Event, item: Item): void {
-          console.log(target, item);
+        
+        handleMenuClick(target: HTMLElement, item: Item): void {
+          const action = target.innerHTML;
+          if (action == "查看") {
+            console.log();
+          }
+          else if (action == "编辑") {
+            
+            console.log();
+          }
+          else if (action == "删除") {
+            console.log();
+          }
         }
       });
       const minMap = new Minimap({
@@ -300,16 +313,33 @@ export default defineComponent({
       self.g6?.setMode("addEdge");
     },
 
-    onEdgeClick(e: IG6GraphEvent) {
-      console.log(e);
+    onSave() {
+      this.graphdata = this.g6?.save();
     },
-
-    onDragEnd(event: IG6GraphEvent, icon: string, nid: string) {
+    hasSameLabel(label: string): boolean {
+      if (this.graphdata) {
+        const nodes = this.graphdata.nodes;
+        if (nodes) {
+          for (const node of nodes) {
+            if (node.label == label) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    },
+    onDragEnd(event: IG6GraphEvent, item: NodeData) {
+      if (item.onlyOne && this.hasSameLabel(item.label)) {
+        message.warning(`控制节点【${item.label}】已经存在！`);
+        return;
+      }
+      console.log(item);
       const point = this.g6?.getPointByClient(event.x, event.y);
       const newNode = {
-        label: nid,
-        img: icon,
-        id: getUID("node"),
+        label: item.label,
+        img: item.imgPath,
+        id: item.appId,
         x: point?.x,
         y: point?.y,
         type: "image",
@@ -339,13 +369,12 @@ export default defineComponent({
   width: 90%;
   overflow: auto;
 }
-.div-node {
-  width: 100px;
-  height: 100px;
-}
 img {
-  max-width: 50%;
+  max-width: 30%;
   height: auto;
+  float: left;
+  padding-left: 5px;
+  padding-top: 5px;
 }
 .div-content-canvas {
   height: 70vh;
