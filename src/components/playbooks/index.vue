@@ -168,17 +168,14 @@ export default defineComponent({
             </ul>`;
           return outDiv;
         },
-        
+
         handleMenuClick(target: HTMLElement, item: Item): void {
           const action = target.innerHTML;
           if (action == "查看") {
             console.log();
-          }
-          else if (action == "编辑") {
-            
+          } else if (action == "编辑") {
             console.log();
-          }
-          else if (action == "删除") {
+          } else if (action == "删除") {
             console.log();
           }
         }
