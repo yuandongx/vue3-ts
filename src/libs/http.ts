@@ -4,7 +4,7 @@ export default class Http {
   basuUrl: string;
   http: AxiosInstance;
   requstConfig: AxiosRequestConfig;
-  constructor(basuUrl = "http://127.0.0.1:8888") {
+  constructor(basuUrl = "http://127.0.0.1:8080") {
     this.basuUrl = basuUrl;
     this.requstConfig = {
       baseURL: this.basuUrl,

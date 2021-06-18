@@ -18,7 +18,7 @@
     </a-tag>
     <br />
     <div>
-      <a href="resource/template.xlsx">下载模板</a>
+      <a href="/resource/template.xlsx">下载模板</a>
       <a-upload
         :customRequest="upload"
         @change="handleChange"

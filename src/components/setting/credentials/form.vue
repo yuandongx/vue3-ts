@@ -1,7 +1,7 @@
 <template>
   <a-modal
     destroyOnClose
-    :visible="formVisibel"
+    :visible="show"
     title="添加访问凭证"
     okText="确定"
     cancelText="取消"
@@ -72,13 +72,19 @@
     </a-form>
   </a-modal>
 </template>
-<script>
-import { Form, Modal, Input, Select, Divider, message } from "ant-design-vue";
+<script lang="ts">
+import { Form, Modal, Input, Select, Divider } from "ant-design-vue";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { createNamespacedHelpers } from "vuex";
-import { inject } from "vue";
+
 const { mapGetters, mapState } = createNamespacedHelpers("setting");
 export default {
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     [Input.name]: Input,
     [Modal.name]: Modal,
@@ -146,18 +152,15 @@ export default {
   },
   methods: {
     onOk: function() {
-      this.$refs.aform.validate().then(() => {
-        this.commitForm();
-        this.formVisibel = false;
-      });
-      this.$refs.aform.resetFields();
-      this.$emit("refresh");
+      console.log();
     },
     onCancel: function() {
-      this.formVisibel = false;
+      // this.formVisibel = false;
+      console.log();
     },
-    update: function(param) {
-      this.form = param;
+    update: function() {
+      // this.form = param;
+      console.log();
     },
     addItem: function() {
       this.showNewMethodModal = true;
@@ -170,56 +173,56 @@ export default {
     handleNewCancle: function() {
       this.showNewMethodModal = false;
     },
-    validatorBecomeUser: function(_, value) {
-      if (this.form.becomeMethod !== "" && value === "") {
-        return Promise.reject("请输入特权密码。");
-      } else {
-        return Promise.resolve();
-      }
-    },
-    validatorBecomePassword: function(_, value) {
-      if (this.form.becomeMethod !== "" && value === "") {
-        return Promise.reject("请输入特权密码。");
-      } else {
-        return Promise.resolve();
-      }
-    },
+    // validatorBecomeUser: function(_, value) {
+    //   if (this.form.becomeMethod !== "" && value === "") {
+    //     return Promise.reject("请输入特权密码。");
+    //   } else {
+    //     return Promise.resolve();
+    //   }
+    // },
+    // validatorBecomePassword: function(_, value) {
+    //   if (this.form.becomeMethod !== "" && value === "") {
+    //     return Promise.reject("请输入特权密码。");
+    //   } else {
+    //     return Promise.resolve();
+    //   }
+    // },
     commitForm: async function() {
-      let response = null;
-      try {
-        if (this.form.id === undefined) {
-          response = await this.http.post("/v1/setting/credentials", this.form);
-        } else if (this.form.id !== undefined) {
-          response = await this.http.patch(
-            "/v1/setting/credentials",
-            this.form
-          );
-        }
-        if (response.data !== undefined) {
-          message.success(response.data);
-        }
-      } catch (error) {
-        message.error(error);
-      }
+      console.log();
+      // try {
+      //   if (this.form.id === undefined) {
+      //     response = await this.http.post("/v1/setting/credentials", this.form);
+      //   } else if (this.form.id !== undefined) {
+      //     response = await this.http.patch(
+      //       "/v1/setting/credentials",
+      //       this.form
+      //     );
+      //   }
+      //   if (response.data !== undefined) {
+      //     message.success(response.data);
+      //   }
+      // } catch (error) {
+      //   message.error(error);
+      // }
     }
   },
-  computed: {
+  // computed: {
     // becomeMethods(){
     //     if (this.newBecomeMethod != ""){
     //         return [this.newBecomeMethod, this.becomeMethods];
     //     }
     //     return this.becomeMethods;
     // },
-    ...mapGetters(["becomeMethods"]),
-    ...mapState({
-      selectedItem: "selectedCrend"
-    })
-  },
-  setup() {
-    const formVisibel = inject("formVisibel", false);
-    return {
-      formVisibel
-    };
-  }
+    // ...mapGetters(["becomeMethods"]),
+    // ...mapState({
+    //   selectedItem: "selectedCrend"
+    // })
+  // },
+  // setup() {
+  //   const formVisibel = inject("formVisibel", false);
+  //   return {
+  //     formVisibel
+  //   };
+  // }
 };
 </script>
